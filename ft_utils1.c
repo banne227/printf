@@ -5,93 +5,43 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: banne <banne@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/20 17:31:09 by banne             #+#    #+#             */
-/*   Updated: 2025/10/21 16:19:27 by banne            ###   ########.fr       */
+/*   Created: 2025/10/22 17:30:48 by banne             #+#    #+#             */
+/*   Updated: 2025/10/22 17:33:47 by banne            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftprintf.h"
+#include "ft_printf.h"
 
-int	ascii_to_hexa(int nbr, int low)
+static int	ft_puthex_base(unsigned long n, const char *base)
 {
-	int		i;
-	char	*ref;
-	char	*resultat;
-	int		size;
+	int	count;
 
-	i = 0;
-	if (nbr % 16 > 0)
-		resultat = malloc(nbr / 16 + 2);
+	count = 0;
+	if (n >= 16)
+		count += ft_puthex_base(n / 16, base);
+	count += ft_putchar(base[n % 16]);
+	return (count);
+}
+
+int	ft_puthex(unsigned int n, int upper)
+{
+	const char	*base;
+
+	if (upper == 1)
+		base = "0123456789ABCDEF";
 	else
-		resultat = malloc(nbr / 16 + 1);
-	if (!resultat)
-		return (0);
-	ref = "0123456789ABCDEF";
-	while (nbr >= 16)
-	{
-		resultat[i] = ref[nbr % 16];
-		nbr /= 16;
-		i++;
-	}
-	resultat[i] = ref[nbr];
-	resultat[i + 1] = '\0';
-	if (low == 1)
-		resultat = ft_tolower(resultat);
-	size = ft_putstr(resultat);
-	return (free(resultat), size);
+		base = "0123456789abcdef";
+	return (ft_puthex_base((unsigned long)n, base));
 }
 
-char	ft_puthex(unsigned long n)
+int	ft_putptr(void *ptr)
 {
-	char	*hex;
+	int	count;
 
-	hex = "0123456789abcdef";
-	return (hex[n % 16]);
-}
-
-void	tri(char *str)
-{
-	int		start;
-	int		end;
-	char	temp;
-
-	start = 0;
-	end = ft_strlen(str) - 1;
-	while (start < end)
-	{
-		temp = str[start];
-		str[start] = str[end];
-		str[end] = temp;
-		start++;
-		end--;
-	}
-	return ;
-}
-
-int	print_address(unsigned long addr)
-{
-	char	*resultat;
-	int		i;
-	int		size;
-
-	if (addr == 0)
-		return (ft_putstr("(nil)"), 5);
-	i = 0;
-	resultat = malloc(sizeof(unsigned long) * 2 + 1);
-	if (!resultat)
-		return (0);
-	ft_putstr("0x");
-	while (addr >= 16)
-	{
-		resultat[i] = ft_puthex(addr);
-		addr /= 16;
-		i++;
-	}
-	resultat[i] = ft_puthex(addr);
-	resultat[i + 1] = '\0';
-	tri(resultat);
-	ft_putstr(resultat);
-	size = ft_strlen(resultat);
-	free(resultat);
-	return (size + 2);
+	if (!ptr)
+		return (ft_putstr("(nil)"));
+	count = 0;
+	count += ft_putstr("0x");
+	count += ft_puthex_base((unsigned long)ptr, "0123456789abcdef");
+	return (count);
 }
